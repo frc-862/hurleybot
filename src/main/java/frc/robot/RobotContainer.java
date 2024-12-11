@@ -5,10 +5,13 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.subsystems.PhotonVision;
 import frc.thunder.LightningContainer;
 import frc.thunder.filter.XboxControllerFilter;
 
 public class RobotContainer extends LightningContainer {
+
+    private PhotonVision vision;
 
     private XboxControllerFilter driver;
 
@@ -18,6 +21,8 @@ public class RobotContainer extends LightningContainer {
     @Override
     protected void initializeSubsystems() {
         driver = new XboxControllerFilter(0, 0.1, -1, 1, XboxControllerFilter.filterMode.SQUARED);
+
+        vision = new PhotonVision();
     }
 
     @Override
