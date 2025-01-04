@@ -13,12 +13,13 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.swervedrive.drivebase.AbsoluteDriveAdv;
-import frc.robot.subsystems.PhotonVision;
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.thunder.LightningContainer;
 import frc.thunder.filter.XboxControllerFilter;
@@ -28,13 +29,12 @@ import swervelib.parser.SwerveParser;
 public class RobotContainer extends LightningContainer {
 
     // private PhotonVision vision;
+    
 
     
-  // Replace with CommandPS4Controller or CommandJoystick if needed
-  final CommandXboxController driverXbox = new CommandXboxController(0);
+  private XboxController driverXbox;
   // The robot's subsystems and commands are defined here...
-  private final SwerveSubsystem drivebase = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),
-                                                                         "swerve/neo"));
+  private SwerveSubsystem drivebase;
   // Applies deadbands and inverts controls because joysticks
   // are back-right positive while robot
   // controls are front-left positive
@@ -49,10 +49,10 @@ public class RobotContainer extends LightningContainer {
                                                                                                OperatorConstants.LEFT_X_DEADBAND),
                                                                  () -> -MathUtil.applyDeadband(driverXbox.getRightX(),
                                                                                                OperatorConstants.RIGHT_X_DEADBAND),
-                                                                 driverXbox.getHID()::getYButtonPressed,
-                                                                 driverXbox.getHID()::getAButtonPressed,
-                                                                 driverXbox.getHID()::getXButtonPressed,
-                                                                 driverXbox.getHID()::getBButtonPressed);
+                                                                 driverXbox::getYButtonPressed,
+                                                                 driverXbox::getAButtonPressed,
+                                                                 driverXbox::getXButtonPressed,
+                                                                 driverXbox::getBButtonPressed);
 
   // Applies deadbands and inverts controls because joysticks
   // are back-right positive while robot
@@ -79,13 +79,12 @@ public class RobotContainer extends LightningContainer {
       () -> MathUtil.applyDeadband(driverXbox.getLeftY(), OperatorConstants.LEFT_Y_DEADBAND),
       () -> MathUtil.applyDeadband(driverXbox.getLeftX(), OperatorConstants.LEFT_X_DEADBAND),
       () -> driverXbox.getRawAxis(2));
-    
-    public RobotContainer() {
-    
-    }
 
     @Override
     protected void initializeSubsystems() {
+        drivebase = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), "swerve"));
+        driverXbox = new XboxController(0);
+
     }
 
     @Override
@@ -95,19 +94,11 @@ public class RobotContainer extends LightningContainer {
     @Override
     protected void configureButtonBindings() {
 
-        driverXbox.a().onTrue((Commands.runOnce(drivebase::zeroGyro)));
-      driverXbox.x().onTrue(Commands.runOnce(drivebase::addFakeVisionReading));
-      driverXbox.b().whileTrue(
-          Commands.deferredProxy(() -> drivebase.driveToPose(
-                                     new Pose2d(new Translation2d(4, 4), Rotation2d.fromDegrees(0)))
-                                ));
-      driverXbox.y().whileTrue(drivebase.aimAtSpeaker(2));
-      driverXbox.start().whileTrue(Commands.none());
-      driverXbox.back().whileTrue(Commands.none());
-      driverXbox.leftBumper().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
-      driverXbox.rightBumper().onTrue(Commands.none());
-      drivebase.setDefaultCommand(
-          !RobotBase.isSimulation() ? driveFieldOrientedDirectAngle : driveFieldOrientedDirectAngleSim);
+        (new Trigger(driverXbox::getAButtonPressed)).onTrue((Commands.runOnce(drivebase::zeroGyro)));
+        (new Trigger(driverXbox::getAButtonPressed)).whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
+        (new Trigger(driverXbox::getRightBumperPressed)).onTrue(Commands.none());
+        drivebase.setDefaultCommand(
+            !RobotBase.isSimulation() ? driveFieldOrientedDirectAngle : driveFieldOrientedDirectAngleSim);
     
     }
 

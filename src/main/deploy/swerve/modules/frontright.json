@@ -7,17 +7,17 @@
   "drive": {
     "type": "falcon",
     "id": 3,
-    "canbus": null
+    "canbus": "Canivore"
   },
   "angle": {
     "type": "falcon",
     "id": 4,
-    "canbus": null
+    "canbus": "Canivore"
   },
   "encoder": {
     "type": "thrifty",
     "id": 1,
-    "canbus": null
+    "canbus": "Canivore"
   },
   "inverted": {
     "drive": false,

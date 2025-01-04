@@ -3,21 +3,21 @@
     "front": -10.5,
     "left": -10.5
   },
-  "absoluteEncoderOffset": 0,
+  "absoluteEncoderOffset": -225.0,
   "drive": {
     "type": "falcon",
     "id": 7,
-    "canbus": null
+    "canbus": "Canivore"
   },
   "angle": {
     "type": "falcon",
     "id": 8,
-    "canbus": null
+    "canbus": "Canivore"
   },
   "encoder": {
     "type": "thrifty",
     "id": 3,
-    "canbus": null
+    "canbus": "Canivore"
   },
   "inverted": {
     "drive": false,
