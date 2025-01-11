@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
@@ -108,8 +109,8 @@ public class RobotContainer extends LightningContainer {
         (new Trigger(driverXbox::getAButtonPressed)).whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
         (new Trigger(driverXbox::getRightBumperPressed)).onTrue(Commands.none());
         (new Trigger(driverXbox::getBButtonPressed)).onTrue(new InstantCommand(() -> pivot.setAngle(0.25)));
-        (new Trigger(driverXbox::getXButton)).whileTrue(collector.getCommand(10));
-    
+
+        (new Trigger(() -> Math.abs(driverXbox.getRightTriggerAxis() - driverXbox.getLeftTriggerAxis()) > 0.1)).whileTrue(new StartEndCommand(() -> collector.setPower(driverXbox.getRightTriggerAxis() - driverXbox.getLeftTriggerAxis()),  () -> collector.setPower(0), collector));
     }
 
     @Override

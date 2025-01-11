@@ -4,6 +4,9 @@
 
 package frc.robot.subsystems;
 
+import java.util.function.DoubleSupplier;
+
+import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 
 import edu.wpi.first.wpilibj2.command.Command;
@@ -13,25 +16,15 @@ import frc.thunder.hardware.ThunderBird;
 
 public class Collector extends SubsystemBase {
     private ThunderBird motor;
-    private VelocityVoltage velocityController;
     public Collector() {
-        motor = new ThunderBird(10, "rio", false, 0, false);
-        velocityController = new VelocityVoltage(0).withSlot(0);
-        motor.configPIDF(0, 0.1, 0, 0, 0);
-        motor.applyConfig();
-        motor.setControl(velocityController);
+        motor = new ThunderBird(10, "Canivore", false, 60, false);
     }
 
     @Override
     public void periodic() {
-
     }
 
-    public void setVelocity(double velocity){
-        velocityController.withVelocity(velocity);
-    }
-
-    public Command getCommand(double velocity){
-        return new StartEndCommand(() -> setVelocity(velocity),  () -> setVelocity(0));
+    public void setPower(double power){
+        motor.setControl(new DutyCycleOut(power));
     }
 }
