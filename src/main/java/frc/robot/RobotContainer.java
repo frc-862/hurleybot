@@ -16,10 +16,13 @@ import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.swervedrive.drivebase.AbsoluteDriveAdv;
+import frc.robot.subsystems.Collector;
+import frc.robot.subsystems.Pivot;
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.thunder.LightningContainer;
 import frc.thunder.filter.XboxControllerFilter;
@@ -35,6 +38,8 @@ public class RobotContainer extends LightningContainer {
   private XboxController driverXbox;
   // The robot's subsystems and commands are defined here...
   private SwerveSubsystem drivebase;
+  private Pivot pivot;
+  private Collector collector;
   // Applies deadbands and inverts controls because joysticks
   // are back-right positive while robot
   // controls are front-left positive
@@ -84,8 +89,10 @@ public class RobotContainer extends LightningContainer {
     @Override
     protected void initializeSubsystems() {
 
+        pivot = new Pivot();
         drivebase = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), "swerve"));
         driverXbox = new XboxController(0);
+        collector = new Collector();
 
         drivebase.setDefaultCommand(closedAbsoluteDriveAdv);
     }
@@ -100,6 +107,8 @@ public class RobotContainer extends LightningContainer {
         (new Trigger(driverXbox::getAButtonPressed)).onTrue((Commands.runOnce(drivebase::zeroGyro)));
         (new Trigger(driverXbox::getAButtonPressed)).whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
         (new Trigger(driverXbox::getRightBumperPressed)).onTrue(Commands.none());
+        (new Trigger(driverXbox::getBButtonPressed)).onTrue(new InstantCommand(() -> pivot.setAngle(0.25)));
+        (new Trigger(driverXbox::getXButton)).whileTrue(collector.getCommand(10));
     
     }
 
