@@ -80,11 +80,14 @@ public class RobotContainer extends LightningContainer {
       () -> MathUtil.applyDeadband(driverXbox.getLeftX(), OperatorConstants.LEFT_X_DEADBAND),
       () -> driverXbox.getRawAxis(2));
 
+
     @Override
     protected void initializeSubsystems() {
+
         drivebase = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), "swerve"));
         driverXbox = new XboxController(0);
 
+        drivebase.setDefaultCommand(closedAbsoluteDriveAdv);
     }
 
     @Override
@@ -97,8 +100,6 @@ public class RobotContainer extends LightningContainer {
         (new Trigger(driverXbox::getAButtonPressed)).onTrue((Commands.runOnce(drivebase::zeroGyro)));
         (new Trigger(driverXbox::getAButtonPressed)).whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
         (new Trigger(driverXbox::getRightBumperPressed)).onTrue(Commands.none());
-        drivebase.setDefaultCommand(
-            !RobotBase.isSimulation() ? driveFieldOrientedDirectAngle : driveFieldOrientedDirectAngleSim);
     
     }
 
